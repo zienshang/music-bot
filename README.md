@@ -21,7 +21,7 @@ Bot nhạc Discord hỗ trợ **YouTube**, **Spotify**, **SoundCloud** — sử 
 ### 1. Clone repo
 
 ```bash
-git clone [https://github.com/zienshang/music-bot.git]
+git clone https://github.com/zienshang/music-bot.git
 cd music-bot
 ```
 
