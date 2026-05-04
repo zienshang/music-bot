@@ -21,8 +21,8 @@ Bot nhạc Discord hỗ trợ **YouTube**, **Spotify**, **SoundCloud** — sử 
 ### 1. Clone repo
 
 ```bash
-git clone https://github.com/your-username/your-repo.git
-cd your-repo
+git clone [https://github.com/zienshang/music-bot.git]
+cd music-bot
 ```
 
 ### 2. Cài dependencies
@@ -32,10 +32,6 @@ pip install -r requirements.txt
 ```
 
 ### 3. Cấu hình `.env`
-
-```bash
-cp .env.example .env
-```
 
 Mở `.env` và điền thông tin:
 
@@ -74,8 +70,8 @@ python-dotenv
 ```
 ├── main.py
 ├── config.py
-├── .env              ← KHÔNG commit (đã có trong .gitignore)
-├── .env.example      ← Template để người khác tự tạo .env
+├── .env              
+├── .env.example      
 ├── cogs/
 │   └── music/
 │       ├── play.py
