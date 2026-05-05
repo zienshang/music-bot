@@ -29,6 +29,7 @@ COMMAND_INFO = {
     "volume":   ("🔊", "Chỉnh âm lượng (0–1000)",                   "-volume <số>"),
     "leave":    ("👋", "Bot rời voice channel",                     "-leave"),
     "clear":    ("🗑️", "Xóa toàn bộ queue",                        "-clear"),
+    "skipto":   ("⏩", "Nhảy đến bài thứ N trong queue",            "-skipto <số>"),
 }
 
 
