@@ -15,7 +15,7 @@
 
 <img src="assets/nowplaying.png" width="280" alt="Now Playing"/>
 <img src="assets/queue.png" width="280" alt="Queue"/>
-<img src="assets/hep.png" width="280" alt="Help"/>
+<img src="assets/help.png" width="280" alt="Help"/>
 
 </div>
 
