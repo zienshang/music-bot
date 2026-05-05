@@ -1,1 +1,65 @@
+server:
+  port: 2333
+  address: 0.0.0.0
 
+lavalink:
+  server:
+    password: "youshallnotpass"
+    sources:
+      youtube: false
+      soundcloud: true
+      twitch: false
+      bandcamp: true
+      http: true
+
+  plugins:
+    - dependency: "dev.lavalink.youtube:youtube-plugin:1.18.0"
+      repository: "https://maven.lavalink.dev/releases"
+      snapshot: false
+
+    - dependency: "com.github.topi314.lavasrc:lavasrc-plugin:4.8.1"
+      repository: "https://maven.lavalink.dev/releases"
+      snapshot: false
+
+  pluginsDir: "./plugins"
+
+plugins:
+  youtube:
+    enabled: true
+    allowSearch: true
+    allowDirectVideoIds: true
+    allowDirectPlaylistIds: true
+    clients:
+      - TVHTML5_SIMPLY
+      - WEB
+      - WEBEMBEDDED
+      - ANDROID_VR
+    oauth:
+      enabled: false
+
+  lavasrc:
+    providers:
+      
+      - "ytsearch:\"%ISRC%\""   # YouTube tìm theo ISRC (chính xác nhất)
+      - "ytsearch:%QUERY%"       # YouTube fallback
+      - "scsearch:%QUERY%"       # SoundCloud fallback
+    sources:
+      spotify: true
+      soundcloud: true
+      youtube: false
+    spotify:
+      # Note: You must have Spotify Premiere account !!!
+      clientId: "your spotify client-ID"
+      clientSecret: "your spotify clientSecret"
+      spDc: "your spotify token"
+      countryCode: "VN"
+      playlistLoadLimit: 2
+      albumLoadLimit: 2
+    soundcloud:
+      clientId: ""
+      playlistLoadLimit: 6
+
+logging:
+  level:
+    dev.lavalink.youtube.http.YoutubeOauth2Handler: INFO
+    com.github.topi314.lavasrc: INFO
