@@ -46,6 +46,7 @@ COGS = [
     "cogs.music.play",      # EN: main play command / VI: lệnh phát nhạc chính
     "cogs.music.addtrack",  # EN: queue a track without playing / VI: thêm bài vào queue
     "cogs.music.skip",      # EN: skip current track / VI: bỏ qua bài đang phát
+    "cogs.music.skipto",    # EN: jump to position in queue / VI: nhảy đến vị trí trong queue
     "cogs.music.queue",     # EN: display queue / VI: hiển thị danh sách phát
     "cogs.music.shuffle",   # EN: shuffle queue / VI: trộn ngẫu nhiên queue
     "cogs.music.loop",      # EN: toggle loop mode / VI: bật/tắt chế độ lặp
