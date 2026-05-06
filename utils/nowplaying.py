@@ -106,12 +106,35 @@ class NowPlayingView(discord.ui.View):
             btn.label = "🔁 Loop: Tắt"
             btn.style = discord.ButtonStyle.secondary
 
+    # ── Shared helper ─────────────────────────────────────────────────────
+    async def _safe_edit(self, interaction: discord.Interaction, **kwargs):
+        """
+        EN: Try to edit the original Now Playing message. If it no longer
+            exists (error 10008 — deleted by NowPlayingManager resend cycle),
+            fall back to a deferred followup so the interaction is still
+            acknowledged and the user doesn't see "interaction failed".
+        VI: Thử edit message Now Playing gốc. Nếu message không còn tồn tại
+            (lỗi 10008 — đã bị NowPlayingManager xóa trong chu kỳ resend),
+            dùng deferred followup để interaction vẫn được xác nhận và
+            người dùng không thấy "interaction failed".
+        """
+        try:
+            await interaction.response.edit_message(**kwargs)
+        except discord.NotFound:
+            # EN: Original message was deleted — acknowledge + send ephemeral notice.
+            # VI: Message gốc đã bị xóa — xác nhận + gửi thông báo ephemeral.
+            await interaction.response.defer(ephemeral=True)
+
     # ── Stop ──────────────────────────────────────────────────────────────
     @discord.ui.button(label="⏹ Stop", style=discord.ButtonStyle.danger, row=0)
     async def stop_btn(self, interaction: discord.Interaction, _):
         """
         EN: Clear the queue, stop playback, and disconnect the bot from voice.
+            Uses _safe_edit to handle the case where the Now Playing message
+            was already replaced by the auto-resend cycle (error 10008).
         VI: Xóa queue, dừng phát nhạc, và ngắt kết nối bot khỏi voice.
+            Dùng _safe_edit để xử lý trường hợp message Now Playing đã bị
+            thay thế bởi chu kỳ auto-resend (lỗi 10008).
         """
         player: wavelink.Player = interaction.guild.voice_client
         if not player:
@@ -120,9 +143,7 @@ class NowPlayingView(discord.ui.View):
         await player.stop()
         await player.disconnect()
         embed = Embed(title="⏹ Đã dừng", description="Bot đã rời voice channel.", color=Colour.red())
-        # EN: Replace embed + remove buttons after stopping.
-        # VI: Thay embed + xóa nút sau khi dừng.
-        await interaction.response.edit_message(embed=embed, view=None)
+        await self._safe_edit(interaction, embed=embed, view=None)
 
     # ── Skip ──────────────────────────────────────────────────────────────
     @discord.ui.button(label="⏭ Skip", style=discord.ButtonStyle.blurple, row=0)
@@ -156,7 +177,7 @@ class NowPlayingView(discord.ui.View):
         await player.pause(not player.paused)
         button.label = "▶️ Resume" if player.paused else "⏸ Pause"
         button.style = discord.ButtonStyle.success if player.paused else discord.ButtonStyle.grey
-        await interaction.response.edit_message(view=self)
+        await self._safe_edit(interaction, view=self)
 
     # ── Loop Cycle ────────────────────────────────────────────────────────
     @discord.ui.button(label="🔁 Loop: Tắt", style=discord.ButtonStyle.secondary, row=0)
@@ -175,7 +196,7 @@ class NowPlayingView(discord.ui.View):
         else:
             player.queue.mode = wavelink.QueueMode.normal
         self._sync_loop_button()
-        await interaction.response.edit_message(view=self)
+        await self._safe_edit(interaction, view=self)
 
 
 # ─── Now Playing Manager ──────────────────────────────────────────────────
