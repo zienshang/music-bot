@@ -88,18 +88,23 @@ class NowPlayingView(discord.ui.View):
         self.player = player
         self._sync_loop_button()  # EN: set initial label/style / VI: đặt nhãn/kiểu ban đầu
 
-    def _sync_loop_button(self):
+    def _sync_loop_button(self, player: wavelink.Player = None):
         """
         EN: Update the Loop button's label and colour to reflect the current mode.
-            Called on init and after each loop state change.
+            Accepts an optional live player so the button always reflects the
+            actual queue state, not the (possibly stale) self.player reference.
+            Falls back to self.player when called from __init__.
         VI: Cập nhật nhãn và màu nút Loop theo chế độ hiện tại.
-            Gọi khi khởi tạo và sau mỗi lần đổi chế độ lặp.
+            Nhận player trực tiếp (tuỳ chọn) để nút luôn phản ánh trạng thái
+            queue thực tế, không dùng self.player có thể đã cũ.
+            Dùng self.player khi gọi từ __init__.
         """
+        p = player or self.player
         btn = self.loop_btn
-        if self.player.queue.mode == wavelink.QueueMode.loop:
+        if p.queue.mode == wavelink.QueueMode.loop:
             btn.label = "🔂 Loop: Bài"
             btn.style = discord.ButtonStyle.success
-        elif self.player.queue.mode == wavelink.QueueMode.loop_all:
+        elif p.queue.mode == wavelink.QueueMode.loop_all:
             btn.label = "🔁 Loop: Tất cả"
             btn.style = discord.ButtonStyle.primary
         else:
@@ -184,8 +189,16 @@ class NowPlayingView(discord.ui.View):
     async def loop_btn(self, interaction: discord.Interaction, _):
         """
         EN: Cycle through loop modes: Normal → Loop Track → Loop All → Normal.
+            Always fetches the live player from guild.voice_client so the mode
+            change works correctly even after a track change (resend cycle).
         VI: Xoay vòng qua các chế độ lặp: Thường → Lặp bài → Lặp tất cả → Thường.
+            Luôn lấy player trực tiếp từ guild.voice_client để thay đổi chế độ
+            hoạt động đúng ngay cả sau khi đổi bài (chu kỳ resend).
         """
+        # EN: Always use the LIVE player from the guild, not self.player which
+        #     may be stale after NowPlayingManager sends a new message on track change.
+        # VI: Luôn dùng player TRỰC TIẾP từ guild, không dùng self.player vì
+        #     có thể đã cũ sau khi NowPlayingManager gửi message mới khi đổi bài.
         player: wavelink.Player = interaction.guild.voice_client
         if not player:
             return await interaction.response.send_message("❌ Bot chưa vào voice!", ephemeral=True)
@@ -195,7 +208,9 @@ class NowPlayingView(discord.ui.View):
             player.queue.mode = wavelink.QueueMode.loop_all
         else:
             player.queue.mode = wavelink.QueueMode.normal
-        self._sync_loop_button()
+        # EN: Pass the live player so _sync_loop_button reads the updated mode.
+        # VI: Truyền player trực tiếp để _sync_loop_button đọc chế độ đã cập nhật.
+        self._sync_loop_button(player)
         await self._safe_edit(interaction, view=self)
 
 
